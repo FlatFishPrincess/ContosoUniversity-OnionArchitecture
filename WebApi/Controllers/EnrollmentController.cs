@@ -37,7 +37,7 @@ namespace WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            return Ok(await Mediator.Send(new GetEnrollmentByIdQuery { Id = id }));
+            return Ok(await Mediator.Send(new GetEnrollmentByIdQuery { ID = id }));
         }
         /// <summary>
         /// Deletes Product Entity based on Id.
@@ -47,7 +47,7 @@ namespace WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            return Ok(await Mediator.Send(new DeleteEnrollmentByIdCommand { Id = id }));
+            return Ok(await Mediator.Send(new DeleteEnrollmentByIdCommand { ID = id }));
         }
         /// <summary>
         /// Updates the Product Entity based on Id.   
@@ -58,7 +58,7 @@ namespace WebApi.Controllers
         [HttpPut("[action]")]
         public async Task<IActionResult> Update(int id, UpdateEnrollmentCommand command)
         {
-            if (id != command.Id)
+            if (id != command.ID)
             {
                 return BadRequest();
             }

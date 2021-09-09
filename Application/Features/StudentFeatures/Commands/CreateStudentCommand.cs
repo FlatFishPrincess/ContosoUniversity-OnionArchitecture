@@ -32,7 +32,7 @@ namespace Application.Features.CourseFeatures.Commands
                 entity.EnrollmentDate = command.EnrollmentDate;
                 _context.Students.Add(entity);
                 await _context.SaveChangesAsync();
-                return entity.Id;
+                return entity.ID;
             }
         }
     }

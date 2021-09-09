@@ -14,6 +14,10 @@ namespace Application.interfaces
         DbSet<Course> Courses { get; set; }
         DbSet<Enrollment> Enrollments { get; set; }
         DbSet<Student> Students { get; set; }
+
+        DbSet<Instructor> Instructors { get; set; }
+        DbSet<Department> Departments { get; set; }
+        DbSet<OfficeAssignment> OfficeAssignments { get; set; }
         Task<int> SaveChangesAsync();
     }
 }

@@ -11,7 +11,7 @@ namespace Application.Features.CourseFeatures.Commands
 {
     public class UpdateCourseCommand : IRequest<int>
     {
-        public int Id { get; set; }
+        public int ID { get; set; }
         public string Title { get; set; }
         public int Credits { get; set; }
         public int DepartmentID { get; set; }
@@ -25,7 +25,7 @@ namespace Application.Features.CourseFeatures.Commands
             }
             public async Task<int> Handle(UpdateCourseCommand command, CancellationToken cancellationToken)
             {
-                var entity = _context.Courses.Where(a => a.Id == command.Id).FirstOrDefault();
+                var entity = _context.Courses.Where(a => a.ID == command.ID).FirstOrDefault();
 
                 if (entity == null)
                 {
@@ -37,7 +37,7 @@ namespace Application.Features.CourseFeatures.Commands
                     entity.Credits = command.Credits;
                     entity.DepartmentID = command.DepartmentID;
                     await _context.SaveChangesAsync();
-                    return entity.Id;
+                    return entity.ID;
                 }
             }
         }

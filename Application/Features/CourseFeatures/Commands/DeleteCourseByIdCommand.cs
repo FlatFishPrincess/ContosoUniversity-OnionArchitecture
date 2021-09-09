@@ -12,7 +12,7 @@ namespace Application.Features.CourseFeatures.Commands
 {
     public class DeleteCourseByIdCommand : IRequest<int>
     {
-        public int Id { get; set; }
+        public int ID { get; set; }
         public class DeleteCourseByIdCommandHandler : IRequestHandler<DeleteCourseByIdCommand, int>
         {
             private readonly IApplicationDbContext _context;
@@ -22,11 +22,11 @@ namespace Application.Features.CourseFeatures.Commands
             }
             public async Task<int> Handle(DeleteCourseByIdCommand command, CancellationToken cancellationToken)
             {
-                var entity = await _context.Courses.Where(a => a.Id == command.Id).FirstOrDefaultAsync();
+                var entity = await _context.Courses.Where(a => a.ID == command.ID).FirstOrDefaultAsync();
                 if (entity == null) return default;
                 _context.Courses.Remove(entity);
                 await _context.SaveChangesAsync();
-                return entity.Id;
+                return entity.ID;
             }
         }
     }

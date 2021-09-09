@@ -12,7 +12,7 @@ namespace Application.Features.CourseFeatures.Queries
 {
     public class GetEnrollmentByIdQuery : IRequest<Enrollment>
     {
-        public int Id { get; set; }
+        public int ID { get; set; }
         public class GetEnrollmentByIdQueryHandler : IRequestHandler<GetEnrollmentByIdQuery, Enrollment>
         {
             private readonly IApplicationDbContext _context;
@@ -23,7 +23,7 @@ namespace Application.Features.CourseFeatures.Queries
             public async Task<Enrollment> Handle(GetEnrollmentByIdQuery query, CancellationToken cancellationToken)
             {
                 var entity = _context.Enrollments
-                                .Where(a => a.Id == query.Id)
+                                .Where(a => a.ID == query.ID)
                                 .FirstOrDefault();
                 if (entity == null) return null;
                 return entity;
