@@ -16,8 +16,6 @@ namespace Application.Features.CourseFeatures.Commands
         public int StudentID { get; set; }
         public Grade? Grade { get; set; }
 
-        public Course Course { get; set; }
-        public Student Student { get; set; }
         // public ICollection<Enrollment> Enrollments { get; set; }
         public class CreateEnrollmentCommandHandler : IRequestHandler<CreateEnrollmentCommand, int>
         {
@@ -31,9 +29,9 @@ namespace Application.Features.CourseFeatures.Commands
                 var entity = new Enrollment();
                 entity.CourseID = command.CourseID;
                 entity.StudentID = command.StudentID;
+                
                 entity.Grade = command.Grade;
-                entity.Course = command.Course;
-                _context.Courses.Add(entity);
+                _context.Enrollments.Add(entity);
                 await _context.SaveChangesAsync();
                 return entity.Id;
             }
