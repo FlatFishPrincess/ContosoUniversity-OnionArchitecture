@@ -1,4 +1,5 @@
 using Application;
+using Persistence.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -36,7 +37,8 @@ namespace WebApi
             });
 
             services.AddApplication();
-            services.AddPersistence(Configuration);
+            services.AddPersistenceContexts(Configuration);
+            services.AddRepositories();
             services.AddControllersWithViews()
                 .AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
