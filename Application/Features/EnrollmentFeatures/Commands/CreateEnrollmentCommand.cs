@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using Domain.Entities;
 using MediatR;
 using System;
@@ -19,20 +20,21 @@ namespace Application.Features.CourseFeatures.Commands
         // public ICollection<Enrollment> Enrollments { get; set; }
         public class CreateEnrollmentCommandHandler : IRequestHandler<CreateEnrollmentCommand, int>
         {
-            private readonly IApplicationDbContext _context;
-            public CreateEnrollmentCommandHandler(IApplicationDbContext context)
+            private readonly IEnrollmentRepository _repository;
+            private IUnitOfWork _unitOfWork { get; set; }
+            public CreateEnrollmentCommandHandler(IEnrollmentRepository repository, IUnitOfWork unitOfWork)
             {
-                _context = context;
+                _repository = repository;
+                _unitOfWork = unitOfWork;
             }
             public async Task<int> Handle(CreateEnrollmentCommand command, CancellationToken cancellationToken)
             {
                 var entity = new Enrollment();
                 entity.CourseID = command.CourseID;
                 entity.StudentID = command.StudentID;
-                
                 entity.Grade = command.Grade;
-                _context.Enrollments.Add(entity);
-                await _context.SaveChangesAsync();
+                await _repository.AddAsync(entity);
+                await _unitOfWork.Commit();
                 return entity.ID;
             }
         }

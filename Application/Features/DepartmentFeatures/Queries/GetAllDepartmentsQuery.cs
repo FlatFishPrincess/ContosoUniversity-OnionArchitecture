@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -15,14 +16,14 @@ namespace Application.Features.DepartmentFeatures.Queries
     {
         public class GetAllDepartmentsQueryHandler : IRequestHandler<GetAllDepartmentsQuery, IEnumerable<Department>>
         {
-            private readonly IApplicationDbContext _context;
-            public GetAllDepartmentsQueryHandler(IApplicationDbContext context)
+            private readonly IDepartmentRepository _repository;
+            public GetAllDepartmentsQueryHandler(IDepartmentRepository repository)
             {
-                _context = context;
+                _repository = repository;
             }
             public async Task<IEnumerable<Department>> Handle(GetAllDepartmentsQuery query, CancellationToken cancellationToken)
             {
-                var entityList = await _context.Departments.ToListAsync();
+                var entityList = await _repository.GetAllAsync();
                 if (entityList == null)
                 {
                     return null;

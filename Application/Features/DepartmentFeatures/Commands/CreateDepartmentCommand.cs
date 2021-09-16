@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using Domain.Entities;
 using MediatR;
 using System;
@@ -21,10 +22,12 @@ namespace Application.Features.DepartmentFeatures.Commands
 
         public class CreateDepartmentCommandHandler : IRequestHandler<CreateDepartmentCommand, int>
         {
-            private readonly IApplicationDbContext _context;
-            public CreateDepartmentCommandHandler(IApplicationDbContext context)
+            private readonly IDepartmentRepository _repositoy;
+            private IUnitOfWork _unitOfWork { get; set; }
+            public CreateDepartmentCommandHandler(IDepartmentRepository repositoy, IUnitOfWork unitOfWork)
             {
-                _context = context;
+                _repositoy = repositoy;
+                _unitOfWork = unitOfWork;
             }
             public async Task<int> Handle(CreateDepartmentCommand command, CancellationToken cancellationToken)
             {
@@ -33,8 +36,8 @@ namespace Application.Features.DepartmentFeatures.Commands
                 entity.Budget = command.Budget;
                 entity.StartDate = command.StartDate;
                 entity.InstructorID = command.InstructorID;
-                _context.Departments.Add(entity);
-                await _context.SaveChangesAsync();
+                await _repositoy.AddAsync(entity);
+                await _unitOfWork.Commit();
                 return entity.ID;
             }
         }

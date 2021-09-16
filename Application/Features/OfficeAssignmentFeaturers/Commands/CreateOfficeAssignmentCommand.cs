@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using Domain.Entities;
 using MediatR;
 using System;
@@ -18,18 +19,20 @@ namespace Application.Features.OfficeAssignmentFeatures.Commands
 
         public class CreateInstructorCommandHandler : IRequestHandler<CreateOfficeAssignmentCommand, int>
         {
-            private readonly IApplicationDbContext _context;
-            public CreateInstructorCommandHandler(IApplicationDbContext context)
+            private readonly IOfficeAssignmentRepository _repository;
+            private IUnitOfWork _unitOfWork { get; set; }
+            public CreateInstructorCommandHandler(IOfficeAssignmentRepository repository, IUnitOfWork unitOfWork)
             {
-                _context = context;
+                _repository = repository;
+                _unitOfWork = unitOfWork;
             }
             public async Task<int> Handle(CreateOfficeAssignmentCommand command, CancellationToken cancellationToken)
             {
                 var entity = new OfficeAssignment();
                 entity.Location = command.Location;
                 entity.InstructorID = command.InstructorID;
-                _context.OfficeAssignments.Add(entity);
-                await _context.SaveChangesAsync();
+                await _repository.AddAsync(entity);
+                await _unitOfWork.Commit();
                 return entity.ID;
             }
         }

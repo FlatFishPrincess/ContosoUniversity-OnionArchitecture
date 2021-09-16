@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using Domain.Entities;
 using MediatR;
 using System;
@@ -19,10 +20,12 @@ namespace Application.Features.CourseFeatures.Commands
         // public ICollection<Enrollment> Enrollments { get; set; }
         public class CreateStudentCommandHandler : IRequestHandler<CreateStudentCommand, int>
         {
-            private readonly IApplicationDbContext _context;
-            public CreateStudentCommandHandler(IApplicationDbContext context)
+            private readonly IStudentRepository _repository;
+            private IUnitOfWork _unitOfWork { get; set; }
+            public CreateStudentCommandHandler(IStudentRepository repository, IUnitOfWork unitOfWork)
             {
-                _context = context;
+                _repository = repository;
+                _unitOfWork = unitOfWork;
             }
             public async Task<int> Handle(CreateStudentCommand command, CancellationToken cancellationToken)
             {
@@ -30,8 +33,8 @@ namespace Application.Features.CourseFeatures.Commands
                 entity.LastName = command.LastName;
                 entity.FirstMidName = command.FirstMidName;
                 entity.EnrollmentDate = command.EnrollmentDate;
-                _context.Students.Add(entity);
-                await _context.SaveChangesAsync();
+                await _repository.AddAsync(entity);
+                await _unitOfWork.Commit();
                 return entity.ID;
             }
         }

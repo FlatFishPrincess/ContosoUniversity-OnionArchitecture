@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -18,14 +19,16 @@ namespace Application.Features.InstructorFeatures.Commands
 
         public class UpdateInstructorCommandHandler : IRequestHandler<UpdateInstructorCommand, int>
         {
-            private readonly IApplicationDbContext _context;
-            public UpdateInstructorCommandHandler(IApplicationDbContext context)
+            private readonly IInstructorRepository _repository;
+            private IUnitOfWork _unitOfWork { get; set; }
+            public UpdateInstructorCommandHandler(IInstructorRepository repository, IUnitOfWork unitOfWork)
             {
-                _context = context;
+                _repository = repository;
+                _unitOfWork = unitOfWork;
             }
             public async Task<int> Handle(UpdateInstructorCommand command, CancellationToken cancellationToken)
             {
-                var entity = _context.Instructors.Where(a => a.ID == command.ID).FirstOrDefault();
+                var entity = await _repository.GetByIdAsync(command.ID);
 
                 if (entity == null)
                 {
@@ -36,7 +39,8 @@ namespace Application.Features.InstructorFeatures.Commands
                     entity.HireDate = command.HireDate;
                     entity.LastName = command.LastName;
                     entity.FirstMidName = command.FirstMidName;
-                    await _context.SaveChangesAsync();
+                    await _repository.UpdateAsync(entity);
+                    await _unitOfWork.Commit();
                     return entity.ID;
                 }
             }

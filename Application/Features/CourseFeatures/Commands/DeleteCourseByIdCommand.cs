@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,17 +16,19 @@ namespace Application.Features.CourseFeatures.Commands
         public int ID { get; set; }
         public class DeleteCourseByIdCommandHandler : IRequestHandler<DeleteCourseByIdCommand, int>
         {
-            private readonly IApplicationDbContext _context;
-            public DeleteCourseByIdCommandHandler(IApplicationDbContext context)
+            private readonly ICourseRepository _repositoy;
+            private IUnitOfWork _unitOfWork { get; set; }
+            public DeleteCourseByIdCommandHandler(ICourseRepository repositoy, IUnitOfWork unitOfWork)
             {
-                _context = context;
+                _repositoy = repositoy;
+                _unitOfWork = unitOfWork;
             }
             public async Task<int> Handle(DeleteCourseByIdCommand command, CancellationToken cancellationToken)
             {
-                var entity = await _context.Courses.Where(a => a.ID == command.ID).FirstOrDefaultAsync();
+                var entity = await _repositoy.GetByIdAsync(command.ID);
                 if (entity == null) return default;
-                _context.Courses.Remove(entity);
-                await _context.SaveChangesAsync();
+                await _repositoy.DeleteAsync(entity);
+                await _unitOfWork.Commit(); ;
                 return entity.ID;
             }
         }

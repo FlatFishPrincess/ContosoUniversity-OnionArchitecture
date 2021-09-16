@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -15,14 +16,14 @@ namespace Application.Features.CourseFeatures.Queries
     {
         public class GetAllCoursesQueryHandler : IRequestHandler<GetAllCoursesQuery, IEnumerable<Course>>
         {
-            private readonly IApplicationDbContext _context;
-            public GetAllCoursesQueryHandler(IApplicationDbContext context)
+            private readonly ICourseRepository _repositoy;
+            public GetAllCoursesQueryHandler(ICourseRepository repositoy)
             {
-                _context = context;
+                _repositoy = repositoy;
             }
             public async Task<IEnumerable<Course>> Handle(GetAllCoursesQuery query, CancellationToken cancellationToken)
             {
-                var entityList = await _context.Courses.ToListAsync();
+                var entityList = await _repositoy.GetAllAsync();
                 if (entityList == null)
                 {
                     return null;

@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using Domain.Entities;
 using MediatR;
 using System;
@@ -15,14 +16,14 @@ namespace Application.Features.OfficeAssignmentFeatures.Queries
         public int ID { get; set; }
         public class GetInstructorByIdQueryHandler : IRequestHandler<GetOfficeAssignmentByIdQuery, OfficeAssignment>
         {
-            private readonly IApplicationDbContext _context;
-            public GetInstructorByIdQueryHandler(IApplicationDbContext context)
+            private readonly IOfficeAssignmentRepository _repository;
+            public GetInstructorByIdQueryHandler(IOfficeAssignmentRepository repository)
             {
-                _context = context;
+                _repository = repository;
             }
             public async Task<OfficeAssignment> Handle(GetOfficeAssignmentByIdQuery query, CancellationToken cancellationToken)
             {
-                var entity = _context.OfficeAssignments.Where(a => a.ID == query.ID).FirstOrDefault();
+                var entity = await _repository.GetByIdAsync(query.ID);
                 if (entity == null) return null;
                 return entity;
             }

@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -15,14 +16,14 @@ namespace Application.Features.OfficeAssignmentFeatures.Queries
     {
         public class GetAllOfficeAssignmentsQueryHandler : IRequestHandler<GetAllOfficeAssignmentsQuery, IEnumerable<OfficeAssignment>>
         {
-            private readonly IApplicationDbContext _context;
-            public GetAllOfficeAssignmentsQueryHandler(IApplicationDbContext context)
+            private readonly IOfficeAssignmentRepository _repository;
+            public GetAllOfficeAssignmentsQueryHandler(IOfficeAssignmentRepository repository)
             {
-                _context = context;
+                _repository = repository;
             }
             public async Task<IEnumerable<OfficeAssignment>> Handle(GetAllOfficeAssignmentsQuery query, CancellationToken cancellationToken)
             {
-                var entityList = await _context.OfficeAssignments.ToListAsync();
+                var entityList = await _repository.GetAllAsync();
                 if (entityList == null)
                 {
                     return null;

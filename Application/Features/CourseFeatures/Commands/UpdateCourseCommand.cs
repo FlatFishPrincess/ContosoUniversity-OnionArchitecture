@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -18,14 +19,16 @@ namespace Application.Features.CourseFeatures.Commands
 
         public class UpdateCourseCommandHandler : IRequestHandler<UpdateCourseCommand, int>
         {
-            private readonly IApplicationDbContext _context;
-            public UpdateCourseCommandHandler(IApplicationDbContext context)
+            private readonly ICourseRepository _repositoy;
+            private IUnitOfWork _unitOfWork { get; set; }
+            public UpdateCourseCommandHandler(ICourseRepository repositoy, IUnitOfWork unitOfWork)
             {
-                _context = context;
+                _repositoy = repositoy;
+                _unitOfWork = unitOfWork;
             }
             public async Task<int> Handle(UpdateCourseCommand command, CancellationToken cancellationToken)
             {
-                var entity = _context.Courses.Where(a => a.ID == command.ID).FirstOrDefault();
+                var entity = await _repositoy.GetByIdAsync(command.ID);
 
                 if (entity == null)
                 {
@@ -36,7 +39,8 @@ namespace Application.Features.CourseFeatures.Commands
                     entity.Title = command.Title;
                     entity.Credits = command.Credits;
                     entity.DepartmentID = command.DepartmentID;
-                    await _context.SaveChangesAsync();
+                    await _repositoy.UpdateAsync(entity);
+                    await _unitOfWork.Commit(); ;
                     return entity.ID;
                 }
             }

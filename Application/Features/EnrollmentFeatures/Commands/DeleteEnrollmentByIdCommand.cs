@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,17 +16,19 @@ namespace Application.Features.CourseFeatures.Commands
         public int ID { get; set; }
         public class DeleteEnrollmentByIdCommandHandler : IRequestHandler<DeleteEnrollmentByIdCommand, int>
         {
-            private readonly IApplicationDbContext _context;
-            public DeleteEnrollmentByIdCommandHandler(IApplicationDbContext context)
+            private readonly IEnrollmentRepository _repository;
+            private IUnitOfWork _unitOfWork { get; set; }
+            public DeleteEnrollmentByIdCommandHandler(IEnrollmentRepository repository, IUnitOfWork unitOfWork)
             {
-                _context = context;
+                _repository = repository;
+                _unitOfWork = unitOfWork;
             }
             public async Task<int> Handle(DeleteEnrollmentByIdCommand command, CancellationToken cancellationToken)
             {
-                var entity = await _context.Enrollments.Where(a => a.ID == command.ID).FirstOrDefaultAsync();
+                var entity = await _repository.GetByIdAsync(command.ID);
                 if (entity == null) return default;
-                _context.Enrollments.Remove(entity);
-                await _context.SaveChangesAsync();
+                await _repository.DeleteAsync(entity);
+                await _unitOfWork.Commit();
                 return entity.ID;
             }
         }

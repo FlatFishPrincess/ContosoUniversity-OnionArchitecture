@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using Domain.Entities;
 using MediatR;
 using System;
@@ -15,14 +16,14 @@ namespace Application.Features.InstructorFeatures.Queries
         public int ID { get; set; }
         public class GetInstructorByIdQueryHandler : IRequestHandler<GetInstructorByIdQuery, Instructor>
         {
-            private readonly IApplicationDbContext _context;
-            public GetInstructorByIdQueryHandler(IApplicationDbContext context)
+            private readonly IInstructorRepository _repository;
+            public GetInstructorByIdQueryHandler(IInstructorRepository repository)
             {
-                _context = context;
+                _repository = repository;
             }
             public async Task<Instructor> Handle(GetInstructorByIdQuery query, CancellationToken cancellationToken)
             {
-                var entity = _context.Instructors.Where(a => a.ID == query.ID).FirstOrDefault();
+                var entity = await _repository.GetByIdAsync(query.ID);
                 if (entity == null) return null;
                 return entity;
             }

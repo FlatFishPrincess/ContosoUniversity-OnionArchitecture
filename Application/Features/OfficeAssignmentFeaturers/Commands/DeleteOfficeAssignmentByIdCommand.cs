@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,17 +16,19 @@ namespace Application.Features.OfficeAssignmentFeatures.Commands
         public int ID { get; set; }
         public class DeleteOfficeAssignmentByIdCommandHandler : IRequestHandler<DeleteOfficeAssignmentByIdCommand, int>
         {
-            private readonly IApplicationDbContext _context;
-            public DeleteOfficeAssignmentByIdCommandHandler(IApplicationDbContext context)
+            private readonly IOfficeAssignmentRepository _repository;
+            private IUnitOfWork _unitOfWork { get; set; }
+            public DeleteOfficeAssignmentByIdCommandHandler(IOfficeAssignmentRepository repository, IUnitOfWork unitOfWork)
             {
-                _context = context;
+                _repository = repository;
+                _unitOfWork = unitOfWork;
             }
             public async Task<int> Handle(DeleteOfficeAssignmentByIdCommand command, CancellationToken cancellationToken)
             {
-                var entity = await _context.OfficeAssignments.Where(a => a.ID == command.ID).FirstOrDefaultAsync();
+                var entity = await _repository.GetByIdAsync(command.ID);
                 if (entity == null) return default;
-                _context.OfficeAssignments.Remove(entity);
-                await _context.SaveChangesAsync();
+                await _repository.UpdateAsync(entity);
+                await _unitOfWork.Commit();
                 return entity.ID;
             }
         }

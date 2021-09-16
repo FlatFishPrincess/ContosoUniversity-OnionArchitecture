@@ -1,4 +1,5 @@
 ﻿using Application.interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,45 +11,53 @@ namespace Persistence.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        protected readonly ApplicationDbContext _context;
-        public GenericRepository(ApplicationDbContext context)
+        private readonly ApplicationDbContext _dbContext;
+
+        public GenericRepository(ApplicationDbContext dbContext)
         {
-            _context = context;
+            _dbContext = dbContext;
         }
 
-        public void Add(T entity)
+        public IQueryable<T> Entities => _dbContext.Set<T>();
+
+        public async Task<T> AddAsync(T entity)
         {
-            _context.Set<T>().Add(entity);
+            await _dbContext.Set<T>().AddAsync(entity);
+            return entity;
         }
 
-        public void AddRange(IEnumerable<T> entities)
+        public Task DeleteAsync(T entity)
         {
-            _context.Set<T>().AddRange(entities);
+            _dbContext.Set<T>().Remove(entity);
+            return Task.CompletedTask;
         }
 
-        public IEnumerable<T> Find(Expression<Func<T, bool>> expression)
+        public async Task<List<T>> GetAllAsync()
         {
-            return _context.Set<T>().Where(expression);
+            return await _dbContext
+                .Set<T>()
+                .ToListAsync();
         }
 
-        public IEnumerable<T> GetAll()
+        public async Task<T> GetByIdAsync(int id)
         {
-            return _context.Set<T>().ToList();
+            return await _dbContext.Set<T>().FindAsync(id);
         }
 
-        public T GetById(int id)
+        public async Task<List<T>> GetPagedReponseAsync(int pageNumber, int pageSize)
         {
-            return _context.Set<T>().Find(id);
+            return await _dbContext
+                .Set<T>()
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
-        public void Remove(T entity)
+        public Task UpdateAsync(T entity)
         {
-            _context.Set<T>().Remove(entity);
-        }
-
-        public void RemoveRange(IEnumerable<T> entities)
-        {
-            _context.Set<T>().RemoveRange(entities);
+            _dbContext.Entry(entity).CurrentValues.SetValues(entity);
+            return Task.CompletedTask;
         }
     }
 }

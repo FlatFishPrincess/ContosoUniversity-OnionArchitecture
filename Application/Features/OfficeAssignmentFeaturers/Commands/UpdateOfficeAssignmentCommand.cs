@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -17,14 +18,16 @@ namespace Application.Features.OfficeAssignmentFeatures.Commands
 
         public class UpdateOfficeAssignmentCommandHandler : IRequestHandler<UpdateOfficeAssignmentCommand, int>
         {
-            private readonly IApplicationDbContext _context;
-            public UpdateOfficeAssignmentCommandHandler(IApplicationDbContext context)
+            private readonly IOfficeAssignmentRepository _repository;
+            private IUnitOfWork _unitOfWork { get; set; }
+            public UpdateOfficeAssignmentCommandHandler(IOfficeAssignmentRepository repository, IUnitOfWork unitOfWork)
             {
-                _context = context;
+                _repository = repository;
+                _unitOfWork = unitOfWork;
             }
             public async Task<int> Handle(UpdateOfficeAssignmentCommand command, CancellationToken cancellationToken)
             {
-                var entity = _context.OfficeAssignments.Where(a => a.ID == command.ID).FirstOrDefault();
+                var entity = await _repository.GetByIdAsync(command.ID);
 
                 if (entity == null)
                 {
@@ -34,7 +37,8 @@ namespace Application.Features.OfficeAssignmentFeatures.Commands
                 {
                     entity.Location = command.Location;
                     entity.InstructorID = command.InstructorID;
-                    await _context.SaveChangesAsync();
+                    await _repository.UpdateAsync(entity);
+                    await _unitOfWork.Commit();
                     return entity.ID;
                 }
             }
