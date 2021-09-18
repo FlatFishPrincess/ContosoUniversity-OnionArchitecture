@@ -1,9 +1,12 @@
 ﻿using Application.interfaces;
+using Application.interfaces.Helpers;
 using Application.interfaces.Repositories;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence;
+using Persistence.Helpers;
 using Persistence.Repositories;
 using System.Reflection;
 
@@ -32,6 +35,16 @@ namespace Persistence.Extensions
             services.AddTransient<IStudentRepository, StudentRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
 
+        }
+
+        public static void AddHelpers(this IServiceCollection services)
+        {
+            services.AddScoped<ISortHelper<Course>, SortHelper<Course>>();
+            services.AddScoped<ISortHelper<Department>, SortHelper<Department>>();
+            services.AddScoped<ISortHelper<Enrollment>, SortHelper<Enrollment>>();
+            services.AddScoped<ISortHelper<Instructor>, SortHelper<Instructor>>();
+            services.AddScoped<ISortHelper<OfficeAssignment>, SortHelper<OfficeAssignment>>();
+            services.AddScoped<ISortHelper<Student>, SortHelper<Student>>();
         }
     }
 }

@@ -39,6 +39,7 @@ namespace WebApi
             services.AddApplication();
             services.AddPersistenceContexts(Configuration);
             services.AddRepositories();
+            services.AddHelpers();
             services.AddControllersWithViews()
                 .AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore

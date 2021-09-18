@@ -1,5 +1,8 @@
-﻿using Application.interfaces;
+﻿using Application.Extensions;
+using Application.interfaces;
+using Application.interfaces.Helpers;
 using Application.interfaces.Repositories;
+using AspNetCoreHero.Results;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -12,23 +15,38 @@ using System.Threading.Tasks;
 
 namespace Application.Features.CourseFeatures.Queries
 {
-    public class GetAllStudentsQuery : IRequest<IEnumerable<Student>>
+    public class GetAllStudentsQuery : IRequest<PaginatedResult<Student>>
     {
-        public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, IEnumerable<Student>>
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+
+        public string OrderBy { get; set; }
+        public GetAllStudentsQuery(int pageNumber, int pageSize, string orderBy)
+        {
+            PageNumber = pageNumber;
+            PageSize = pageSize;
+            OrderBy = orderBy;
+        }
+        public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, PaginatedResult<Student>>
         {
             private readonly IStudentRepository _repository;
-            public GetAllStudentsQueryHandler(IStudentRepository repository)
+            private ISortHelper<Student> _helper;
+            public GetAllStudentsQueryHandler(IStudentRepository repository, ISortHelper<Student> helper)
             {
                 _repository = repository;
+                _helper = helper;
             }
-            public async Task<IEnumerable<Student>> Handle(GetAllStudentsQuery query, CancellationToken cancellationToken)
+            public async Task<PaginatedResult<Student>> Handle(GetAllStudentsQuery query, CancellationToken cancellationToken)
             {
-                var entityList = await _repository.GetAllAsync();
+                var entityList = _repository.Entities;
                 if (entityList == null)
                 {
                     return null;
                 }
-                return entityList.AsReadOnly();
+                var sortedEntityList = _helper.ApplySort(entityList, query.OrderBy);
+                var paginatedList = await sortedEntityList
+                                    .ToPaginatedListAsync(query.PageNumber, query.PageSize);
+                return paginatedList;
             }
         }
     }

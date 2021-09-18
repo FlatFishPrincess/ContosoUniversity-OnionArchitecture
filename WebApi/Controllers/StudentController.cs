@@ -25,9 +25,9 @@ namespace WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(int pageNumber, int pageSize, string orderBy)
         {
-            return Ok(await Mediator.Send(new GetAllStudentsQuery()));
+            return Ok(await Mediator.Send(new GetAllStudentsQuery(pageNumber, pageSize, orderBy)));
         }
         /// <summary>
         /// Gets Product Entity by Id.
