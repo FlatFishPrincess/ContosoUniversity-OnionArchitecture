@@ -21,11 +21,15 @@ namespace Application.Features.CourseFeatures.Queries
         public int PageSize { get; set; }
 
         public string OrderBy { get; set; }
-        public GetAllStudentsQuery(int pageNumber, int pageSize, string orderBy)
+
+        public string Search { get; set; }
+        public GetAllStudentsQuery(int pageNumber, int pageSize, string orderBy, string search = "")
         {
             PageNumber = pageNumber;
             PageSize = pageSize;
             OrderBy = orderBy;
+            Search = search;
+            
         }
         public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, PaginatedResult<Student>>
         {
@@ -42,6 +46,10 @@ namespace Application.Features.CourseFeatures.Queries
                 if (entityList == null)
                 {
                     return null;
+                }
+                if (query.Search != null)
+                {
+                    entityList = _repository.SearchByName(query.Search);
                 }
                 var sortedEntityList = _helper.ApplySort(entityList, query.OrderBy);
                 var paginatedList = await sortedEntityList

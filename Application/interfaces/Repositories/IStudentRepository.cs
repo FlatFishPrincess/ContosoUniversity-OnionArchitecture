@@ -9,5 +9,6 @@ namespace Application.interfaces.Repositories
 {
     public interface IStudentRepository : IGenericRepository<Student>
     {
+        IQueryable<Student> SearchByName(String name);
     }
 }
