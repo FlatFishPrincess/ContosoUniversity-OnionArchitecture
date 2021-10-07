@@ -23,5 +23,18 @@ namespace Persistence.Repositories
                             
             return entities;
         }
+
+        public async Task<Student> GetStudentDetailById(int id)
+        {
+            return await _dbContext
+                .Students
+                .Include(s => s.Enrollments)
+                .ThenInclude(e => e.Course)
+                .FirstOrDefaultAsync(s => s.ID == id);
+
+
+            // var entity = await _dbContext.Students.FirstOrDefaultAsync(s => s.ID == id);
+        }
+
     }
 }

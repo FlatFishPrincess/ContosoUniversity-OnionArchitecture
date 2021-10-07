@@ -1,5 +1,6 @@
 ﻿using Application.Features.CourseFeatures.Commands;
 using Application.Features.CourseFeatures.Queries;
+using Application.Features.StudentFeatures.Queries;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -37,7 +38,7 @@ namespace WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            return Ok(await Mediator.Send(new GetStudentByIdQuery { ID = id }));
+            return Ok(await Mediator.Send(new GetStudentDetailByIdQuery { ID = id }));
         }
         /// <summary>
         /// Deletes Product Entity based on Id.

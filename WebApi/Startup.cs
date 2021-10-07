@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Extensions;
 
 namespace WebApi
 {
@@ -36,7 +37,7 @@ namespace WebApi
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApi", Version = "v1" });
             });
 
-            services.AddApplication();
+            services.AddApplicationLayer();
             services.AddPersistenceContexts(Configuration);
             services.AddRepositories();
             services.AddHelpers();
