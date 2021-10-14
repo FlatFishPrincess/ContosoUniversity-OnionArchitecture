@@ -1,6 +1,7 @@
 ﻿using Application.Features.CourseFeatures.Commands;
 using Application.Features.CourseFeatures.Queries;
 using Application.Features.StudentFeatures.Queries;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,17 @@ namespace WebApi.Controllers
         /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
+        {
+            return Ok(await Mediator.Send(new GetStudentDetailByIdQuery { ID = id }));
+        }
+
+        /// <summary>
+        /// Gets Product Entity by Id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("detail/{id}")]
+        public async Task<ActionResult<GetStudentDetailByIdResponse>> GetStudentDetailById(int id)
         {
             return Ok(await Mediator.Send(new GetStudentDetailByIdQuery { ID = id }));
         }

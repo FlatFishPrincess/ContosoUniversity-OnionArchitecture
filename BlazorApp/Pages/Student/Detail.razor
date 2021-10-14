@@ -1,0 +1,45 @@
+﻿@page "/student/{studentId:int}"
+@inject HttpClient HttpClient
+@inject StudentService StudentService
+
+<h3>Detail</h3>
+
+@if (studentResponse != null)
+{
+    <div>
+        first name: @studentResponse.FirstMidName
+    </div>
+    <div>
+        last name: @studentResponse.LastName
+    </div>
+    @if (studentResponse.Enrollments.Any())
+    {
+        @foreach (var enrollment in studentResponse.Enrollments)
+        {
+            <div>
+                Course Title: @enrollment.CourseTitle
+            </div>
+            <div>
+                Grade: @enrollment.Grade
+            </div>
+        }
+
+    }
+
+}
+@code {
+    [Parameter] public int studentId { get; set; }
+    GetStudentDetailByIdResponse studentResponse;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            studentResponse = await StudentService.GetStudentDetailById(studentId);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("error occurred1!!");
+        }
+
+    }
+}
